@@ -1,216 +1,233 @@
 <?php
+  include("../../assets/includes/validacao.php");
+  include("../validar_sessao.php");
+  // $cargo1 = "ADM";
+  // $cargo2 = "FUNCIONARIO";
  
-    header("Access-Control-Allow-Origin: *");
-    header("Content-Type: application/json; charset=UTF-8");
-    header("Access-Control-Allow-Methods: GET, POST, PUT");
-    header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
+
+  $end_point = "http://localhost/api_jornal/usuarios/";
  
-    $method = $_SERVER["REQUEST_METHOD"];
-    include("../connection/connection.php");
+  // inicializando o CURL
+  $ch = curl_init();
  
-    if($method == "GET"){
-        //echo "GET";
+  // Configurações od CURL (options)
+  curl_setopt_array($ch, [
+      CURLOPT_URL => $end_point,
+      CURLOPT_CUSTOMREQUEST => 'GET',
+      CURLOPT_RETURNTRANSFER => true,
+  ]);
  
-        if (!isset($_GET["id"])){
+  // recebe o request da API - formato JSON
+  $resultado = curl_exec($ch);
  
-            // listar todos os registros
-            try {
-               
-                $sql = "SELECT pk_id, e_mail, habilita, cargo
-                        FROM usuarios";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute();
+  // finaliza o CURL
+  curl_close($ch);
  
-                $dados = $stmt->fetchall(PDO::FETCH_OBJ);
+  // JSON decode, transforma o JSON em array ou objeto
+  $dados = json_decode($resultado, TRUE);
  
-                $result["usuarios"]=$dados;
-                $result["status"] = "success";
+  // echo "<pre>";
+  // var_dump($dados);
+  // echo "</pre>";
  
-                http_response_code(200);
+  $status = "success";
+  if ($dados["status"]=="success"){
+    $registros = $dados["usuarios"];
+  }else{
+    echo $status = "fail";
+    echo $msg = $dados["error"];
+  };
  
-            } catch (PDOException $ex) {
-                // echo "error: ". $ex->getMEssage();
-                $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-                http_response_code(200);
-            }finally{
-                $conn = null;
-                echo json_encode($result);
-            }
-        }else{
-            // listar um registro
-            try{
- 
-                if(empty($_GET["id"]) || !is_numeric($_GET["id"])){
-                    // está vazio ou não é numérico : ERRO
-                    throw new ErrorException("Valor inválido", 1);
-                }
-                $id = $_GET["id"];
- 
-                $sql = "SELECT pk_id, e_mail, habilita, cargo
-                        FROM usuarios
-                        WHERE pk_id=:id";
-               
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(":id", $id);
-                $stmt->execute();
- 
-                $dado = $stmt->fetch(PDO::FETCH_OBJ);
-                $result['usuarios'] = $dado;
-                $result["status"] = "success";
- 
-            }catch(PDOException $ex){
-                $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-                http_response_code(200);
-            }catch(Exception $ex){
-                $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-                http_response_code(200);
-            }finally{
-                $conn = null;
-                echo json_encode($result);
-            }
-           
-        }
- 
-       
-    }
-    if($method=="POST"){
-       
-        // recupera dados do corpo (body) de uma requisão POST
-        $dados = file_get_contents("php://input");
- 
-        // decodifica JSON, sem opção TRUE
-        $dados = json_decode($dados); // isso retorna um OBJETO
- 
-        // função trim retira espaços que estão sobrando
-        $e_mail = trim($dados->e_mail); // acessa valor de um OBJETO
-        $cargo = trim($dados->cargo); // acessa valor de um OBJETO
-        $senha = trim($dados->senha); // acessa valor de um OBJETO
-        $habilita = trim($dados->habilita); // acessa valor de um OBJETO
- 
-        try {
-            if(empty($e_mail) ){
-                // está vazio  : ERRO
-                throw new ErrorException("E_mail inválido", 1);
-            }
-           
-            $sql = "INSERT INTO usuarios(e_mail, cargo senha, habilita, )
-                    VALUES (:e_mail, :cargo, :senha, :habilita)";
- 
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(":e_mail", $e_mail);
-            $stmt->bindParam(":senha", $senha);
-            $stmt->bindParam(":habilita", $habilita);
-            $stmt->bindParam(":cargo", $cargo);
-            $stmt->execute();
- 
-            $result = array("status"=>"success");
- 
-        } catch (PDOException $ex) {
-            $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-            http_response_code(200);
-        }catch(Exception $ex){
-            $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-            http_response_code(200);
-        }finally{
-            $conn = null;
-            echo json_encode($result);
-        }
- 
- 
- 
-    }
-    if($method=="PUT"){
-        // recupera dados do corpo (body) de uma requisão POST
-        $dados = file_get_contents("php://input");
- 
-        // decodifica JSON, sem opção TRUE
-        $dados = json_decode($dados); // isso retorna um OBJETO
- 
-        // função trim retira espaços que estão sobrando
-         $e_mail = trim($dados->e_mail); // acessa valor de um OBJETO
-         $senha = trim($dados->senha); // acessa valor de um OBJETO
-         $habilita = trim($dados->habilita); // acessa valor de um OBJETO
-         $cargo = trim($dados->cargo); // acessa valor de um OBJETO
-         $id = trim($dados->id); // acessa valor de um OBJETO
-       
-        try {
-            if(empty($e_mail) ){
-                // está vazio  : ERRO
-                throw new ErrorException("E-mail inválido", 1);
-            }
-           
-            if (!empty($senha)){
-                $sql = "UPDATE usuarios SET e_mail=:e_mail, senha=:senha, habilita=:habilita, cargo=:cargo
-                        WHERE pk_id=:id";
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(":e_mail", $e_mail);
-                $stmt->bindParam(":senha", $senha);
-                $stmt->bindParam(":habilita", $habilita);
-                $stmt->bindParam(":cargo", $cargo);
-                $stmt->bindParam(":id", $id);
- 
-            }else{
-                $sql = "UPDATE usuarios SET e_mail=:e_mail, habilita=:habilita, cargo=:cargo
-                        WHERE pk_id=:id";
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(":e_mail", $e_mail);
-                $stmt->bindParam(":habilita", $habilita);
-                $stmt->bindParam(":cargo", $cargo);
-                $stmt->bindParam(":id", $id);
-            }
-           
-            $stmt->execute();
- 
-            $result = array("status"=>"success");
- 
-        } catch (PDOException $ex) {
-            $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-            http_response_code(200);
-        }catch(Exception $ex){
-            $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-            http_response_code(200);
-        }finally{
-            $conn = null;
-            echo json_encode($result);
-        }
- 
-    }
- 
-    if($method=="DELETE"){
-        try{
- 
-            if(empty($_GET["id"]) || !is_numeric($_GET["id"])){
-                // está vazio ou não é numérico : ERRO
-                throw new ErrorException("Valor inválido", 1);
-            }
-            $id = $_GET["id"];
- 
-            $sql= "DELETE FROM usuarios  
-                    WHERE pk_id=:id";
-           
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(":id", $id);
-            $stmt->execute();
-           
-            $result["status"] = "success";
- 
-        }catch(PDOException $ex){
-            $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-            http_response_code(200);
-        }catch(Exception $ex){
-            $result =["status"=> "fail", "error"=> $ex->getMEssage()];
-            http_response_code(200);
-        }finally{
-            $conn = null;
-            echo json_encode($result);
-        }
-     
-    }
- 
- 
- 
- 
- 
- 
+  // echo "<pre>";
+  // var_dump($registros);
+  // echo "</pre>";
+
  
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuarios</title>
+ 
+  <?php include("../../assets/includes/head.php"); ?>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+ 
+  <!-- Preloader -->
+  <div class="preloader flex-column justify-content-center align-items-center">
+    <img class="animation__shake" src="../../vendor/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+  </div>
+ 
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="<?php echo $path."/".$home_interno; ?>" class="nav-link">Home</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
+        <a href="#" class="nav-link">Contact</a>
+      </li>
+    </ul>
+ 
+    <!-- Right navbar links -->
+    <?php include("../../assets/includes/right_menu.php"); ?>
+  </nav>
+  <!-- /.navbar -->
+ 
+  <!-- Main Sidebar Container -->
+  <?php include("../../assets/includes/menu.php"); ?>
+ 
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+   
+    <!-- Main content -->
+    <?php
+    $explode = explode("/",$_SERVER["REQUEST_URI"]);
+ 
+    $local = $explode[2];
+
+  ?>
+   
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Usuarios</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Usuarios</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+ 
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+           
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Usuarios</h3>
+                <?php 
+                       if(($registros==$_SESSION["email"]) || ($_SESSION['cargo']=="ADM") ) {
+                          ?>
+                          <a href="form.php" class="btn btn-primary"><i class="fas fa-plus"></i> NOVO</a>
+                        <?php
+                        }
+                        ?>  
+                
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <table id="example1" class="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>E-Mail</th>                      
+                      <th>CARGO</th>                      
+                      <th>Habilita</th>
+                      <?php 
+                        if($_SESSION['cargo']=="ADM") {
+                          ?>
+                          <th>Ação</th>
+                        <?php
+                        }
+                        ?>
+                    </tr>
+                  </thead>
+                  <tbody>
+ 
+                    <?php
+                    // laço de repetição para que possa listar todos os
+                    // registro trazidos pela API
+                      foreach($registros as $registro){
+                    ?>
+ 
+                    <tr>
+                      <th><?php echo $registro["pk_id"]; ?></th>
+                      <td><?php echo $registro["e_mail"];  ?></td>                      
+                      <td><?php echo $registro["cargo"]; ?></td>
+                      <td><?php echo $registro["habilita"]; ?></td>
+                      <td>
+                        <?php 
+                        if($_SESSION['cargo']=="ADM") {
+                          ?>
+                          <a href="form.php?id=<?php echo $registro["pk_id"]; ?>" 
+                            class="btn btn-secondary"><i class="fas fa-pen"                                                   
+                          ></i> ALTERAR </a>
+                          <a href="delete.php?id=<?php echo $registro["pk_id"]; ?>" class="btn btn-danger"><i class="fas fa-trash-alt"></i> EXCLUIR</a>
+                        <?php
+                        }
+                        ?>
+                        
+                      </td>
+                    </tr>
+ 
+                    <?php
+                      }
+                    ?>
+ 
+                  </tbody>
+                  <tfoot>
+                  <tr>
+                  <th>ID</th>
+                      <th>E-Mail</th>
+                      <th>CARGO</th>  
+                      <th>Habilita</th>
+                      <?php 
+                        if($_SESSION['cargo']=="ADM") {
+                          ?>
+                          <th>Ação</th>
+                        <?php
+                        }
+                        ?>
+                     
+                  </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+   
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
+    All rights reserved.
+    <div class="float-right d-none d-sm-inline-block">
+      <b>Version</b> 3.2.0
+    </div>
+  </footer>
+ 
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+<?php include("../../assets/includes/scripts.php"); ?>
+ 
+</body>
+</html>
