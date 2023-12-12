@@ -71,11 +71,10 @@
       <!-- /.social-auth-links -->
 
       <p class="mb-1">
-        <a href="forgot-password.html">Esqueci minha senha</a>
+        <a href="../admin/recover/forgot-password.php">Esqueci minha senha</a>
       </p>
-      <p class="mb-0">
-        <a href="register.html" class="text-center">Cadastrar-se</a>
-      </p>
+      
+      
     </div>
     <!-- /.login-card-body -->
   </div>

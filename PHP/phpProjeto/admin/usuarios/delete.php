@@ -1,8 +1,16 @@
 <?php
     include("../validar_sessao.php");
+
  
     if (isset($_GET['id']) && is_numeric($_GET['id'])){
         $id = $_GET["id"];
+
+        if($id != $_SESSION["id"]) {
+            $msg = "Não Autorizado!";
+            $status = "fail";
+            header("location: index.php?msg=$msg&status=$status");
+            exit;
+          }
  
  
         // endpoint da API
@@ -24,6 +32,8 @@
  
         // conersão do JSON para ARRAY
         $dado = json_decode($response, TRUE);
+
+       
  
         // testar Retorno da API
         if ($dado["status"] == 'fail'){
@@ -45,6 +55,8 @@
         header("location: index.php?msg=$msg&status=$status");
         exit;
     }
+
+    
  
  
 ?>

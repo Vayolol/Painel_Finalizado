@@ -7,7 +7,7 @@
         if(empty($_POST["nome"])){
             $msg= "Campo nome obrigatório";
             $status = 'fail';
-            header("location: form.php?msg=$msg&status=$status");
+            header("location: index.php?msg=$msg&status=$status");
             exit;
         }
    

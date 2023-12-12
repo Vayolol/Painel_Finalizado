@@ -1,7 +1,9 @@
 <?php
   include("../../assets/includes/validacao.php");
   include("../validar_sessao.php");
-
+  // $cargo1 = "ADM";
+  // $cargo2 = "FUNCIONARIO";
+ 
 
 
   $end_point = "http://localhost/api_jornal/usuarios/";
@@ -40,7 +42,7 @@
   // echo "<pre>";
   // var_dump($registros);
   // echo "</pre>";
- 
+
  
 ?>
 <!DOCTYPE html>
@@ -118,7 +120,14 @@
             <div class="card">
               <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title">Usuarios</h3>
-                <a href="form.php" class="btn btn-primary"><i class="fas fa-plus"></i> NOVO</a>
+                <?php 
+                       if(($registros==$_SESSION["email"]) || ($_SESSION['cargo']=="ADM") ) {
+                          ?>
+                          <a href="form.php" class="btn btn-primary"><i class="fas fa-plus"></i> NOVO</a>
+                        <?php
+                        }
+                        ?>  
+                
               </div>
               <!-- /.card-header -->
               <div class="card-body">
@@ -126,9 +135,16 @@
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>E-Mail</th>
+                      <th>E-Mail</th>                      
+                      <th>CARGO</th>                      
                       <th>Habilita</th>
-                      <th>Ação</th>
+                      <?php 
+                        if($_SESSION['cargo']=="ADM") {
+                          ?>
+                          <th>Ação</th>
+                        <?php
+                        }
+                        ?>
                     </tr>
                   </thead>
                   <tbody>
@@ -141,11 +157,21 @@
  
                     <tr>
                       <th><?php echo $registro["pk_id"]; ?></th>
-                      <td><?php echo $registro["e_mail"]; ?></td>
+                      <td><?php echo $registro["e_mail"];  ?></td>                      
+                      <td><?php echo $registro["cargo"]; ?></td>
                       <td><?php echo $registro["habilita"]; ?></td>
                       <td>
-                        <a href="form.php?id=<?php echo $registro["pk_id"]; ?>" class="btn btn-secondary"><i class="fas fa-pen"></i> ALTERAR</a>
-                        <a href="delete.php?id=<?php echo $registro["pk_id"]; ?>" class="btn btn-danger"><i class="fas fa-trash-alt"></i> EXCLUIR</a>
+                        <?php 
+                        if($_SESSION['cargo']=="ADM") {
+                          ?>
+                          <a href="form.php?id=<?php echo $registro["pk_id"]; ?>" 
+                            class="btn btn-secondary"><i class="fas fa-pen"                                                   
+                          ></i> ALTERAR </a>
+                          <a href="delete.php?id=<?php echo $registro["pk_id"]; ?>" class="btn btn-danger"><i class="fas fa-trash-alt"></i> EXCLUIR</a>
+                        <?php
+                        }
+                        ?>
+                        
                       </td>
                     </tr>
  
@@ -158,8 +184,16 @@
                   <tr>
                   <th>ID</th>
                       <th>E-Mail</th>
+                      <th>CARGO</th>  
                       <th>Habilita</th>
-                      <th>Ação</th>
+                      <?php 
+                        if($_SESSION['cargo']=="ADM") {
+                          ?>
+                          <th>Ação</th>
+                        <?php
+                        }
+                        ?>
+                     
                   </tr>
                   </tfoot>
                 </table>

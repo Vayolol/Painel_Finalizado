@@ -2,10 +2,13 @@
   include("../../assets/includes/validacao.php");
   include("../validar_sessao.php");
 
+  
   $id = "";
   $e_mail ="";
+  $cargo="";
   $habilita = "";
  
+
 
   if(isset($_GET['id']) && is_numeric($_GET['id'])){
     $id = $_GET['id'];
@@ -46,9 +49,32 @@
       $usuario = $dado["usuarios"];
       $e_mail = $usuario["e_mail"];
       $habilita = $usuario["habilita"];
+      $cargo = $usuario["cargo"];
     }
+
   
+
+    if($_SESSION['cargo']!="ADM") {
+      if($e_mail != $_SESSION["email"]) {
+      $msg = "Não Autorizado ";
+      $status = "fail";
+      header("location: index.php?msg=$msg&status=$status");
+      exit;
+    }
+    } 
+   
+ 
+
+    
+  }else{
+    if( $_SESSION['cargo']!="ADM") {
+      $msg = "Não Autorizado !";
+      $status = "fail";
+      header("location: index.php?msg=$msg&status=$status");
+      exit;
+    }
   }
+
 
   
 ?>
@@ -133,6 +159,10 @@
                     <div class="form-group">	
                       <label for="e_mail">E-mail</label>
                       <input type="text" id="e_mail" name="e_mail" value="<?php echo $e_mail ? $usuario["e_mail"] : ""  ?>" class="form-control" placeholder="Informe e-mail">
+                    </div>                
+                    <div class="form-group">	
+                      <label for="cargo">Cargo</label>
+                      <input type="text" id="cargo" name="cargo" value="<?php echo $cargo ?>" class="form-control" placeholder="Informe o Cargo">
                     </div>
                     <div class="form-group">	
                       <label for="senha1">Senha</label>

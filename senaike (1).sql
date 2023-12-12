@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 08-Dez-2023 às 20:59
+-- Tempo de geração: 12-Dez-2023 às 21:06
 -- Versão do servidor: 10.4.27-MariaDB
 -- versão do PHP: 8.0.25
 
@@ -147,15 +147,20 @@ CREATE TABLE `usuarios` (
   `pk_id` int(11) NOT NULL,
   `e_mail` varchar(220) DEFAULT NULL,
   `senha` varchar(80) DEFAULT NULL,
-  `habilita` smallint(11) DEFAULT NULL
+  `habilita` smallint(11) DEFAULT NULL,
+  `recuperar_senha` varchar(80) NOT NULL,
+  `cargo` varchar(80) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Extraindo dados da tabela `usuarios`
 --
 
-INSERT INTO `usuarios` (`pk_id`, `e_mail`, `senha`, `habilita`) VALUES
-(1, 'kksus@gmail.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 1);
+INSERT INTO `usuarios` (`pk_id`, `e_mail`, `senha`, `habilita`, `recuperar_senha`, `cargo`) VALUES
+(1, 'kksus@gmail.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 1, '', 'ADM'),
+(2, 'kknoti@gmail.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 1, '', 'ADM'),
+(3, 'igorjuniordossantosferazlite@gmail.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 'd33752e2', 'FUNCIONARIO'),
+(4, 'cosiashshd@gmail.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 1, '', '');
 
 --
 -- Índices para tabelas despejadas
@@ -247,7 +252,7 @@ ALTER TABLE `revisor`
 -- AUTO_INCREMENT de tabela `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `pk_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `pk_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

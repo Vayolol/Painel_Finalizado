@@ -4,7 +4,8 @@
     if (!empty($_POST)){
         $e_mail = $_POST["e_mail"];
         $senha1 = $_POST["senha1"];
-        $senha2 = $_POST["senha2"];
+        $senha2 = $_POST["senha2"];      
+        $cargo = $_POST["cargo"];      
         if(!empty($_POST["habilita"])){
             $habilita = 1;
         }else{
@@ -45,6 +46,13 @@
 
             $senha = hash('sha256', $senha1);
 
+            // if(empty($_POST["cargo"])){
+            //     $msg= "Campo cargo obrigatório";
+            //     $status = 'fail';
+            //     header("location: index.php?msg=$msg&status=$status");
+            //     exit;
+            // }
+
         }else{
             // se ID NÃO é vazio será realizado PUT
             $method = "PUT";
@@ -62,14 +70,16 @@
             }else{
                 $senha = hash('sha256', $senha1);
             }
-            
+         
         }
+     
 
         $post_body = json_encode([
             'id' => $id,
             'e_mail' => $e_mail, 
             'senha' => $senha, 
-            'habilita' => $habilita
+            'habilita' => $habilita,
+            'cargo' => $cargo,
         ]);
 
         // configurações do CURL
